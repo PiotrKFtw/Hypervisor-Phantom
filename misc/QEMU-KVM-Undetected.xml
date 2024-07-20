@@ -4,6 +4,7 @@
   <currentMemory unit="G">12</currentMemory>
   <!-- ... -->
   <os>
+    <!-- You shouldn't use SMBIOS Mode = Host as Anti-Cheats can easily fingerprint ur real hardware -->
     <smbios mode="host"/>
   </os>
   <features>
@@ -34,6 +35,12 @@
     <feature policy="require" name="invtsc"/>
     <feature policy="require" name="topoext"/>
     <feature policy="require" name="svm"/>
+    <!-- Disable VM-Specific Flags that aren't present on Real Hardware but are injected by QEMU or other HV (To tell the VM it's vulnerable to smth) --> 
+    <feature policy="disable" name="virt-ssbd"/>
+    <feature policy="disable" name="ssbd"/>
+    <feature policy="disable" name="amd-ssbd"/>
+    <feature policy="disable" name="pdpe1gb"/>
+    <feature policy="disable" name="pdpe1gb"/>
   </cpu>
   <clock offset="localtime">
     <timer name="tsc" present="yes" mode="native"/>
@@ -57,7 +64,7 @@
       <!-- Use SATA to avoid using the VirtIO driver -->
       <target dev="sda" bus="sata"/>
       <!-- Set a custom serial for every VM -->
-      <serial>590347474223828</serial>
+      <serial>XXXXXXXXXXXXXXX</serial>
       <boot order="1"/>
       <address type="drive" controller="0" bus="0" target="0" unit="0"/>
     </disk>
@@ -71,6 +78,7 @@
     </interface>
     <!-- TPM in passthrough mode is the most well hidden option for Windows 11 -->
     <tpm model="tpm-tis">
+      <!-- You shouldn't passthrough your real TPM if you don't want it to get banned. -->
       <backend type="passthrough">
         <device path="/dev/tpm0"/>
       </backend>
@@ -81,11 +89,13 @@
   <qemu:commandline>
     <qemu:arg value="-smbios"/>
     <!-- Replace with your output of `# dmidecode -t 17` -->
-    <qemu:arg value="type=17,manufacturer=KINGSTON,loc_pfx=DDR4,speed=3200,serial=XXXXXX,part=XXXX"/>
+    <qemu:arg value="type=17,manufacturer=XXXXXXX,loc_pfx=DDR4,speed=3200,serial=XXXXXX,part=XXXX"/>
   </qemu:commandline>
   <qemu:override>
     <qemu:device alias="sata0-0-0">
       <qemu:frontend>
+         <!-- Use Rotation Rate 1 if the model you use in VM is an SSD -->
+         <!-- It's also recommended to use SSD model in a VM if the VM Image is stored on a real SSD and the reverse for HDD also applies - to increase lifespan -->
         <qemu:property name="rotation_rate" type="unsigned" value="1"/>
       </qemu:frontend>
     </qemu:device>
